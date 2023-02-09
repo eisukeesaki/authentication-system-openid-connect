@@ -1,5 +1,8 @@
+/// <reference path="declarations.d.ts"/>
 import express, { Request, Response } from 'express';
 import mustacheExpress from 'mustache-express';
+
+import * as authn from './authn';
 
 /**
  * log server environment info
@@ -22,11 +25,29 @@ app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 
 /**
- * route /
- * render home page containing link to initiate OIDC flow
+ * INDEX ROUTE
+ * render view template
+ * send rendered HTML containing link to initiate OIDC flow
  */
 app.get('/', (req: Request, res: Response) => {
   res.render('index');
+});
+
+/**
+ * PRIVATE ROUTE
+ * render view template
+ * send rendered HTML containing private information
+ */
+app.get('/private', authn.requireAuthn, (req: Request, res: Response) => {
+  // extract userinfo out of received session token
+  const userinfo = {
+    name: "Asuka"
+  };
+
+  res.render('private', {
+    // some private data to be used to render a view template template
+    userinfo
+  });
 });
 
 /**
