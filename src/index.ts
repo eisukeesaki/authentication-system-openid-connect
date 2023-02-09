@@ -54,6 +54,6 @@ app.get('/private', authn.requireAuthn, (req: Request, res: Response) => {
  * Start a TCP server listening for connections on the given port and host
  */
 app.listen(process.env.PORT, () => {
-  console.log(`Express started on port ${process.env.PORT}`);
+  console.log(`Express started on port ${process.env.PORT}\n`);
 });
 
