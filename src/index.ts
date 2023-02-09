@@ -1,4 +1,11 @@
 /// <reference path="declarations.d.ts"/>
+
+/*##############################################################################
+
+# set up Express application object
+
+##############################################################################*/
+
 import express, { Request, Response } from 'express';
 import mustacheExpress from 'mustache-express';
 
@@ -26,7 +33,6 @@ app.set('views', __dirname + '/views');
 
 /**
  * INDEX ROUTE
- * render view template
  * send rendered HTML containing link to initiate OIDC flow
  */
 app.get('/', (req: Request, res: Response) => {
@@ -35,11 +41,10 @@ app.get('/', (req: Request, res: Response) => {
 
 /**
  * PRIVATE ROUTE
- * render view template
  * send rendered HTML containing private information
  */
 app.get('/private', authn.requireAuthn, (req: Request, res: Response) => {
-  // extract userinfo out of received session token
+  // TODO: const userinfo = extract userinfo out of received session token
   const userinfo = {
     name: "Asuka"
   };
