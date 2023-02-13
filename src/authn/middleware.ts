@@ -3,7 +3,39 @@
 # define middlewares
 
 ##############################################################################*/
+
 import { Request, Response, NextFunction } from 'express';
+import { Issuer } from 'openid-client';
+
+function getDomain(): string {
+  return `http://${process.env.HOST}:${process.env.PORT}`;
+}
+
+export async function initAuthn(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (req.app.authnIssuer) {
+    return next();
+  }
+
+  const issuerGoogle = await Issuer.discover('https://accounts.google.com');
+  // console.log('issuerGoogle:', issuerGoogle);
+
+  const client = new issuerGoogle.Client({
+    client_id: process.env.OAUTH_CLIENT_ID!,
+    client_secret: process.env.OAUTH_CLIENT_SECRET,
+    redirect_uris: [`${getDomain()}/auth/callback`],
+    response_types: ['code']
+  });
+  // console.log('client:', client);
+
+  req.app.authnIssuer = issuerGoogle;
+  req.app.authnClient = client;
+
+  next();
+}
 
 /**
  * block unauthenticated requests
@@ -14,6 +46,7 @@ export async function requireAuthn(
   next: NextFunction
 ) {
   const session = req.session;
+  console.log('session:\n', session);
 
   if (!session)
     return res.status(401).send('user agent not authenticated');

@@ -8,7 +8,7 @@
 
 import express, { Request, Response } from 'express';
 import mustacheExpress from 'mustache-express';
-
+import cookieParser from 'cookie-parser';
 import * as authn from './authn';
 
 /**
@@ -24,12 +24,17 @@ ENVIRONMENT:
 
 const app = express();
 
+app.use(cookieParser());
+
 /**
  * set up mustache-express as templating engine
  */
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
+
+app.use(authn.initAuthn);
+app.use(authn.routes());
 
 /**
  * INDEX ROUTE
