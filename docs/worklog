@@ -1,0 +1,6 @@
+implemented a authn initializer function which instantiates Issuer & Client and stores them in req for route handlers to consume
+
+start working from here
+    continue implementing /auth/login
+    understand this first
+        https://github.com/panva/node-openid-client#authorization-code-flow
