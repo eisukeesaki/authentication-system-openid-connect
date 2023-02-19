@@ -1,0 +1,73 @@
+sequenceDiagram
+
+    participant b as browser
+    participant a as app
+    participant azs as authZ server
+    participant ids as identity server
+
+    b-)a: GET /
+    a-)b: 200
+    Note right of b: index.html
+
+    b-)a: GET /auth/login
+    a-)b: 302
+    Note right of b: Location: accounts.google.com/o/oauth2/v2/auth<br>Set-Cookie: state<br>QS: client_id, scope, response_type, redirect_uri, state
+
+    %% initiate OAuth 2.0 authZ code flow on Google
+    rect rgb(0, 64, 131)
+    b-)azs: GET accounts.google.com/o/oauth2/v2/auth
+    Note left of azs: QS: client_id, scope, response_type, redirect_uri, state<br>referer: app.com/
+    azs-)b: 200
+    Note right of b: login.html
+
+    %% send email address
+    rect rgb(0, 91, 187)
+    b-)azs: POST accounts.google.com/_/lookup/accountlookup<br>
+    Note left of azs: email address<br>QS: client_id, scope, response_type, redirect_uri, state<br>referer: accounts.google.com/o/oauth2/v2/auth/identifier
+    azs-) b: 200
+
+    %% send password
+    b-)azs: POST accounts.google.com/_/signin/challenge
+    Note left of azs: password<br>QS: client_id, scope, response_type, redirect_uri, state<br>referer: accounts.google.com/signin/v2/challenge/pwd
+    azs-) b: 200
+
+    %% send OTP
+    b-)azs: accounts.google.com/_/signin/challenge
+    Note left of azs: OTP<br>PQS: client_id, scope, response_type, redirect_uri, state<br>referer: accounts.google.com/signin/v2/challenge/totp
+    azs-) b: 200
+
+    %% b-)azs: GET accounts.google.com/CheckCookie
+    %% Note left of azs: QS: client_id, redirect_uri, scope<br>referer: accounts.google.com/signin/v2/challenge/totp
+    %% azs-)b: 302
+    %% Note right of b: Location: accounts.google.com/signin/oauth/consent
+    end
+
+    %% send consent
+    b-)azs: GET accounts.google.com/signin/oauth/consent
+    Note left of azs: client_id<br>referer: https://accounts.google.com/
+    azs-)b: 302
+    Note right of b: <br>Location: app.com/auth/callback<br>QS: state, code, scope
+    end
+
+    %% send code
+    b-)a: GET app.com/auth/callback
+    Note left of a: QS: state, code, scope
+    %% exchange code for Access Token and ID Token
+    a-)ids: POST oauth2.googleapis.com/token
+    Note left of ids: body: code, client_id, client_secret, grant_type, redirect_uri
+    ids-)a: response
+    Note right of a: body: access_token, id_token, refresh_token
+    %% get identity
+    a-)ids: response openidconnect.googleapis.com/v1/userinfo
+    Note left of ids: access_token, id_token, scope, token_type, expires_at
+    ids-)a: response
+    Note right of a: name, email
+    %% redirect to private route
+    a-)b: 302
+    Note right of b: Location: /private<br>Set-Cookie: state, AUTH
+
+    %% get protected resource
+    b-)a: GET app.com/private
+    Note left of a: Cookie: state, AUTH
+    a-)b: 200
+    Note right of b: protected resource on app
