@@ -4,7 +4,7 @@
 
 ##############################################################################*/
 
-import { IDSession } from './authn';
+import { IDSession } from './authN';
 import { Issuer, Client } from 'openid-client';
 
 declare global {
