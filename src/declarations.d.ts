@@ -4,7 +4,7 @@
 
 ##############################################################################*/
 
-import { ISession } from './authn';
+import { IDSession } from './authn';
 import { Issuer, Client } from 'openid-client';
 
 declare global {
@@ -14,7 +14,7 @@ declare global {
       authnClient: Client;
     }
     export interface Request {
-      session?: ISession;
+      session?: IDSession;
     }
   }
 }

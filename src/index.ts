@@ -6,10 +6,14 @@
 
 ##############################################################################*/
 
+import { logRequest } from './utils/loggers';
 import express, { Request, Response } from 'express';
 import mustacheExpress from 'mustache-express';
 import cookieParser from 'cookie-parser';
 import * as authn from './authn';
+import { getSessionCookie } from './authn/cookie';
+
+Error.stackTraceLimit = 1;
 
 /**
  * log server environment info
@@ -24,6 +28,8 @@ ENVIRONMENT:
 
 const app = express();
 
+app.use(logRequest);
+
 app.use(cookieParser());
 
 /**
@@ -34,6 +40,7 @@ app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 
 app.use(authn.initAuthn);
+app.use(authn.session);
 app.use(authn.routes());
 
 /**
@@ -49,14 +56,17 @@ app.get('/', (req: Request, res: Response) => {
  * send rendered HTML containing private information
  */
 app.get('/private', authn.requireAuthn, (req: Request, res: Response) => {
+  console.trace('req.session: %o', req.session);
   // TODO: const userinfo = extract userinfo out of received session token
-  const userinfo = {
-    name: "Asuka"
-  };
+  const user = req.session?.user;
+  console.trace('passing `user` to template renderer: %o', user);
+  // const userinfo = {
+  //   name: "Asuka"
+  // };
 
   res.render('private', {
     // some private data to be used to render a view template template
-    userinfo
+    user
   });
 });
 
