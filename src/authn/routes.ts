@@ -37,7 +37,7 @@ export default function authnRoutesMiddleware(): Router {
      * construct authz URL
      * URL components: client_id, scope, response_type, redirect_uri, state
      */
-    const authzUrl = req.app.authnClient.authorizationUrl({
+    const authzUrl = req.app.authNClient.authorizationUrl({
       scope: 'openid email profile',
       state: state
     });
@@ -55,9 +55,6 @@ export default function authnRoutesMiddleware(): Router {
     res.redirect(authzUrl);
   });
 
-  /*
-   * @todo
-   */
   router.get('/auth/callback', async function(req, res, next) {
     /**
      * extract state out of req.cookies
@@ -68,7 +65,7 @@ export default function authnRoutesMiddleware(): Router {
     /**
      * extract code, state out of req.url
      */
-    const client = req.app.authnClient;
+    const client = req.app.authNClient;
     const params = client.callbackParams(req);
 
     /**

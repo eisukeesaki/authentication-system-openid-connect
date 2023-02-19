@@ -1,4 +1,4 @@
-implemented a authn initializer function which instantiates Issuer & Client and stores them in req for route handlers to consume
+implemented a authN initializer function which instantiates Issuer & Client and stores them in req for route handlers to consume
 
 start working from here
     continue implementing /auth/login

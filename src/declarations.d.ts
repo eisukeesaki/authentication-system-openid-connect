@@ -10,8 +10,8 @@ import { Issuer, Client } from 'openid-client';
 declare global {
   namespace Express {
     export interface Application {
-      authnIssuer?: Issuer;
-      authnClient: Client;
+      authNIssuer?: Issuer;
+      authNClient: Client;
     }
     export interface Request {
       session?: IDSession;

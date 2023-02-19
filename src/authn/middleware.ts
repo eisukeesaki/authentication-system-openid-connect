@@ -13,12 +13,12 @@ export function getDomain(): string {
   return `http://${process.env.HOST}:${process.env.PORT}`;
 }
 
-export async function initAuthn(
+export async function initAuthN(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  if (req.app.authnIssuer) {
+  if (req.app.authNIssuer) {
     return next();
   }
 
@@ -33,8 +33,8 @@ export async function initAuthn(
   });
   // console.log('client:', client);
 
-  req.app.authnIssuer = issuerGoogle;
-  req.app.authnClient = client;
+  req.app.authNIssuer = issuerGoogle;
+  req.app.authNClient = client;
 
   next();
 }
