@@ -64,10 +64,10 @@ sequenceDiagram
     Note right of a: name, email
     %% redirect to private route
     a-)b: 302
-    Note right of b: Location: /private<br>Set-Cookie: state, AUTH
+    Note right of b: Location: /private<br>Set-Cookie: state, authN
 
     %% get protected resource
     b-)a: GET app.com/private
-    Note left of a: Cookie: state, AUTH
+    Note left of a: Cookie: state, authN
     a-)b: 200
     Note right of b: protected resource on app
