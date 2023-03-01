@@ -58,7 +58,7 @@ sequenceDiagram
     ids-)a: response
     Note right of a: body: access_token, id_token, refresh_token
     %% get identity
-    a-)ids: response openidconnect.googleapis.com/v1/userinfo
+    a-)ids: ? openidconnect.googleapis.com/v1/userinfo
     Note left of ids: access_token, id_token, scope, token_type, expires_at
     ids-)a: response
     Note right of a: name, email

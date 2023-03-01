@@ -1,14 +1,14 @@
 /*##############################################################################
 
-# define authn routes
+# define authN routes
 
 ##############################################################################*/
 
 import { Router } from 'express';
 import {
   serializeAuthnState,
-  setAuthnStateCookie,
-  getAuthnStateCookie,
+  setAuthNStateCookie,
+  getAuthNStateCookie,
   deserializeAuthnState
 } from './state';
 import { getDomain } from './middleware';
@@ -18,7 +18,7 @@ import { setSessionCookie } from './cookie';
 /**
  * middleware that hosts all authn routes
  */
-export default function authnRoutesMiddleware(): Router {
+export default function authNRoutesMiddleware(): Router {
   const router = Router();
 
   /*
@@ -34,42 +34,43 @@ export default function authnRoutesMiddleware(): Router {
     console.trace('created state %o:', state);
 
     /**
-     * construct authz URL
+     * construct authZ URL
      * URL components: client_id, scope, response_type, redirect_uri, state
      */
-    const authzUrl = req.app.authNClient.authorizationUrl({
+    const authZUrl = req.app.authNClient.authorizationUrl({
       scope: 'openid email profile',
       state: state
     });
-    console.trace('constructed authzUrl %o:', authzUrl);
+    console.trace('constructed authZUrl %o:', authZUrl);
 
     /**
      * set HTTP Set-Cookie response header `state`
      */
-    setAuthnStateCookie(res, state);
+    setAuthNStateCookie(res, state);
 
     /**
      * redirect user agent to authorization URL
      */
-    console.trace('redirecting user agent to authorization URL: %o', authzUrl);
-    res.redirect(authzUrl);
+    console.trace('redirecting user agent to authorization URL: %o', authZUrl);
+    res.redirect(authZUrl);
   });
 
   router.get('/auth/callback', async function(req, res, next) {
     /**
-     * extract state out of req.cookies
+     * extract state out of cookies
      */
-    const state = getAuthnStateCookie(req);
+    const state = getAuthNStateCookie(req);
     const { backToPath } = deserializeAuthnState(state);
 
-    /**
-     * extract code, state out of req.url
-     */
     const client = req.app.authNClient;
+    /**
+     * extract code & state out of query string
+     */
     const params = client.callbackParams(req);
 
     /**
-     * make Access Token & ID Token request to authz server
+     * make Access Token & ID Token request to authZ server
+     * POST ...oauth2.googleapis.com/token
      */
     console.trace('making access token request to authorization server...');
     const tokenSet = await client.callback(
@@ -84,10 +85,11 @@ export default function authnRoutesMiddleware(): Router {
      */
     console.trace('making protected resource request to resource server...');
     const user = await client.userinfo(tokenSet);
-    console.trace('received user: %o', user);
+    console.trace('received userinfo: %o', user);
 
     /**
      * set Set-Cookie response header `state`, `authN`
+     * @todo this is a temporary solution
      */
     const sessionCookie = serialize({ user, tokenSet });
     setSessionCookie(res, sessionCookie);

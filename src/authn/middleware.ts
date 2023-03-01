@@ -23,7 +23,7 @@ export async function initAuthN(
   }
 
   const issuerGoogle = await Issuer.discover('https://accounts.google.com');
-  // console.log('issuerGoogle:', issuerGoogle);
+  console.trace('loaded OIDC authorization server metadata documents. : %o', issuerGoogle);
 
   const client = new issuerGoogle.Client({
     client_id: process.env.OAUTH_CLIENT_ID!,
@@ -31,7 +31,7 @@ export async function initAuthN(
     redirect_uris: [`${getDomain()}/auth/callback`],
     response_types: ['code']
   });
-  // console.log('client:', client);
+  console.trace('instantiated client: %o', client);
 
   req.app.authNIssuer = issuerGoogle;
   req.app.authNClient = client;
@@ -39,6 +39,10 @@ export async function initAuthN(
   next();
 }
 
+/**
+* @todo ?refresh access token if necessary
+* @todo ?validate received ID Token's integrity
+*/
 export function session(
   req: Request,
   res: Response,

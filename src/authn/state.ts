@@ -11,9 +11,6 @@ interface AnState {
 
 export function serializeAuthnState(state: Partial<AnState>): string {
   /*
-   * take backToPath
-   * generate random bytes and encode them into url safe base64
-   * encode the combined data into url safe base64
    * @notes .state() is an alias of generators.random([bytes])
    */
   const toSerialize = {
@@ -28,11 +25,11 @@ export function deserializeAuthnState(value: string): AnState {
   return fromBase64(value);
 }
 
-export function setAuthnStateCookie(res: Response, state: string): void {
+export function setAuthNStateCookie(res: Response, state: string): void {
   console.trace('Set-Cookie: state=%o', state);
   res.cookie(STATE_COOKIE, state/* , @todo options */);
 }
 
-export function getAuthnStateCookie(req: Request): string {
+export function getAuthNStateCookie(req: Request): string {
   return req.cookies[STATE_COOKIE];
 }
