@@ -2,4 +2,3 @@ node_modules
 Session.vim
 .env
 dump.rdb
-vision
