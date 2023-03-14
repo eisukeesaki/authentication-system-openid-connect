@@ -1,0 +1,12 @@
+mandatory
+    @implement server-side session management
+    @implement PKCE
+        https://security.stackexchange.com/questions/214980/does-pkce-replace-state-in-the-authorization-code-oauth-flow#:~:text=As%20the%20OP%20has%20correctly,entire%20flow%2C%20state%20is%20redundant.
+        https://github.com/panva/node-openid-client/
+        https://github.com/panva/node-openid-client/blob/main/docs/README.md
+    @todo(s)
+    determine relevancy and apply things written in https://redis.io/docs/getting-started/
+
+desireable
+    log informational data using https://www.npmjs.com/package/debug
+
