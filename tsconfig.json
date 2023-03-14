@@ -1,16 +1,3 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es5",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "jsx": "react",
-    "strictNullChecks": true,
-    "downlevelIteration": true,
-    "outDir": "./dist"
-  },
-  "exclude": ["**/*.d.ts", "dist", "node_modules"]
+  "extends": "@tsconfig/recommended/tsconfig.json",
 }
