@@ -54,7 +54,8 @@ export function session(
 
   const session = deserialize(sessionCookie);
 
-  req.session = session;
+  // req.session = session;
+  // @todo? create and save session record
 
   next();
 }

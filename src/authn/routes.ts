@@ -14,11 +14,12 @@ import {
 import { getDomain } from './middleware';
 import { serialize } from './session';
 import { setSessionCookie } from './cookie';
+// import { generators } from 'openid-client';
 
 /**
  * middleware that hosts all authn routes
  */
-export default function authNRoutesMiddleware(): Router {
+export default function authNRoutes(): Router {
   const router = Router();
 
   /*
@@ -33,13 +34,21 @@ export default function authNRoutesMiddleware(): Router {
     const state = serializeAuthnState({ backToPath });
     console.trace('created state %o:', state);
 
+    /*
+     * create additional OA2 params to implement PKCE
+     */
+    // const code_verifier = generators.codeVerifier();
+    // const code_challenge = generators.codeChallenge(code_verifier);
+
     /**
      * construct authZ URL
      * URL components: client_id, scope, response_type, redirect_uri, state
      */
     const authZUrl = req.app.authNClient.authorizationUrl({
       scope: 'openid email profile',
-      state: state
+      state: state,
+      // code_challenge,
+      // code_challenge_method: 'S256',
     });
     console.trace('constructed authZUrl %o:', authZUrl);
 
@@ -56,16 +65,17 @@ export default function authNRoutesMiddleware(): Router {
   });
 
   router.get('/auth/callback', async function(req, res, next) {
+    // console.trace('req: %o', req);
     /**
      * extract state out of cookies
      */
     const state = getAuthNStateCookie(req);
     const { backToPath } = deserializeAuthnState(state);
 
-    const client = req.app.authNClient;
     /**
      * extract code & state out of query string
      */
+    const client = req.app.authNClient;
     const params = client.callbackParams(req);
 
     /**
@@ -76,9 +86,11 @@ export default function authNRoutesMiddleware(): Router {
     const tokenSet = await client.callback(
       `${getDomain()}/auth/callback`,
       params,
-      { state }
+      { state },
+      // { code_verifier },
     );
     console.trace('received access token from authorization server: %o', tokenSet);
+    console.trace('calling tokenSet.claims(): %o', tokenSet.claims());
 
     /**
      * make protected-resource request to resource server
@@ -86,6 +98,10 @@ export default function authNRoutesMiddleware(): Router {
     console.trace('making protected resource request to resource server...');
     const user = await client.userinfo(tokenSet);
     console.trace('received userinfo: %o', user);
+
+    /**
+     * create and save session?
+     **/
 
     /**
      * set Set-Cookie response header `state`, `authN`
